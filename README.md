@@ -1,83 +1,44 @@
-# SmartBin: User-Centered Interactive IoT Waste Monitoring and Feedback System
+# SmartBin IoT Waste Management System
 
-SmartBin is a production-ready, fully functional Human-Computer Interaction (HCI) system that reimagines waste management. It utilizes IoT ultrasonic sensors to monitor bin fill levels in real-time, providing immediate auditory and visual feedback to users, alongside actionable data for facility managers through a responsive web dashboard.
+## Overview
+SmartBin is a comprehensive Internet of Things (IoT) waste management solution designed to provide real-time monitoring of waste fill levels. The system integrates embedded hardware with a modern web dashboard to optimize waste collection processes, featuring instantaneous status feedback, continuous hardware monitoring, and an asynchronous data synchronization architecture.
 
-## 🚀 Features
+## Architecture
 
-- **Real-Time Level Tracking**: Uses ultrasonic sensors to calculate bin fill percentage continuously.
-- **Interactive HCI Feedback**: Immediate visual (RGB LEDs) and auditory (Buzzer) feedback when users interact with the bin.
-- **Smart Alert System**: Tracks state changes with cooldown logic to prevent auditory fatigue.
-- **Live Dashboard**: A beautiful Next.js UI with real-time polling to monitor all registered bins.
-- **Notification System**: Floating on-screen alerts when a bin reaches maximum capacity.
-- **Activity Logs**: Full historical tracking of fill levels and status changes for every bin.
+### Hardware Component (Embedded Systems)
+The hardware component is built upon the ESP32 microcontroller, utilizing an HC-SR04 ultrasonic sensor to continuously measure the distance to the waste surface. 
 
-## 🛠 Tech Stacks
+Key Hardware Features:
+- Fill Level Detection: Utilizes ultrasonic pulses to calculate waste percentage based on configurable bin capacity.
+- Hysteresis and Debouncing: Implements software state debounce logic to mitigate threshold jitter and ensure stable state transitions.
+- Status Indication: Features an RGB LED to visually communicate the current fill state (Green: Empty, Yellow: Half-Full, Red: Full).
+- Audible Alerts: Active-Low buzzer system for state-change notifications and a continuous alarm state machine when the bin reaches maximum capacity.
+- Hardware Override: Tactile button integrated with non-blocking timers to allow manual system toggling and alarm silencing.
 
-- **Frontend & Backend**: Next.js (App Router, Full-stack)
-- **Styling**: Tailwind CSS (with Glassmorphism and animations)
-- **Database**: MySQL (connected via `mysql2` connection pooling)
-- **Authentication**: NextAuth.js (Credentials Provider + bcrypt)
-- **Hardware**: ESP32 / ESP8266 Microcontroller
-- **Sensors/Actuators**: HC-SR04 Ultrasonic Sensor, RGB LED, Active Buzzer, Push Button
+### Software Component (Web Dashboard)
+The software layer is a full-stack Next.js application designed to provide centralized monitoring.
 
-## 🚦 Status Logic
+Key Software Features:
+- Real-Time Synchronization: Asynchronously polls the MySQL database to display instantaneous changes in hardware states.
+- System Registry: Interface to register new physical bins with unique UUIDs and specific physical parameters.
+- Authentication: Secure session management.
+- Database Architecture: Relational MySQL database tracking bins, locations, and historical fill-level logs.
 
-The Arduino processes distance measurements and converts them into three distinct states based on the percentage filled:
-- **Empty (Green)**: 0% to 20% filled.
-- **Half-Full (Yellow)**: 21% to 85% filled. Triggers 2 short warning beeps upon entering this state.
-- **Full (Red)**: > 85% filled. Triggers 1 long continuous beep and a dashboard notification.
+## Technologies Used
+- Hardware: ESP32, HC-SR04 Ultrasonic Sensor, RGB LED, Active Buzzer, Tactile Button.
+- Firmware: C++ (Arduino IDE format) utilizing hardware timers and state machine logic.
+- Frontend: Next.js (App Router), React, Tailwind CSS.
+- Backend: Next.js Route Handlers, MySQL, Node.js.
 
-## 🔌 API Endpoints
+## Setup and Deployment
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/register` | Registers a new user. Expects `name`, `email`, `password`. |
-| `GET`  | `/api/bins` | Retrieves all bins for the authenticated user. |
-| `POST` | `/api/bins` | Creates a new bin. Expects `name`, `location`, `capacity_cm`. |
-| `GET`  | `/api/bins/[id]` | Retrieves details and historical logs (max 50) for a specific bin. |
-| `POST` | `/api/bin-data` | Receives data from the ESP32. Expects `bin_id` and `distance_cm`. Updates logs and status. |
+### Hardware Initialization
+1. Wire the ESP32 to the sensor, LEDs, and buzzer according to the pin configurations in the firmware.
+2. Update the network credentials and target API endpoint in the `smart_bin.ino` file.
+3. Flash the firmware to the ESP32 using the Arduino IDE. 
 
----
-
-## ⚙️ Setup & Installation Guide
-
-This project includes a database initialization script, making it incredibly easy to install and run on any new computer.
-
-### 1. Prerequisites
-- **Node.js** installed on your machine.
-- **XAMPP**, **WAMP**, or a local **MySQL** server installed and running.
-- **Arduino IDE** (for flashing the ESP32 code).
-
-### 2. Database Initialization
-You do not need to manually create tables in MySQL Workbench.
-1. Open XAMPP and start **MySQL**.
-2. Navigate to the `web` folder in your terminal:
-   ```bash
-   cd web
-   ```
-3. Run the database setup script. This will automatically create `smartbin_db` and all necessary tables (`users`, `bins`, `bin_logs`):
-   ```bash
-   node init-db.js
-   ```
-
-### 3. Running the Next.js App
-1. Install the required Node packages:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Open your browser to `http://localhost:3000`. Register an account and create your first SmartBin in the dashboard. Copy the generated **Bin ID**.
-
-### 4. Hardware Setup (Arduino)
-1. Open `arduino/smart_bin/smart_bin.ino` in the Arduino IDE.
-2. Update the configuration variables at the top of the file:
-   - `ssid`: Your Wi-Fi network name.
-   - `password`: Your Wi-Fi password.
-   - `serverUrl`: The local IPv4 address of the computer running the Next.js app (e.g., `http://192.168.1.5:3000/api/bin-data`). Do not use `localhost`.
-   - `BIN_ID`: The UUID you copied from your Next.js dashboard.
-3. Connect your ESP32, select the correct COM port, and click **Upload**.
-
-Enjoy your fully integrated SmartBin system!
+### Web Server Initialization
+1. Initialize the MySQL database and execute the schema initialization scripts.
+2. Configure the `.env` file with the database connection strings and authentication secrets.
+3. Install dependencies utilizing `npm install`.
+4. Deploy the local development server via `npm run dev`.

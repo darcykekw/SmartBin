@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/authOptions";
 import pool from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

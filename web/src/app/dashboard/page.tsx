@@ -21,20 +21,20 @@ export default function Dashboard() {
       router.push("/login");
     } else if (status === "authenticated") {
       fetchBins();
-      const interval = setInterval(fetchBins, 5000); // Polling every 5 seconds
+      const interval = setInterval(fetchBins, 2000); // Polling every 2 seconds
       return () => clearInterval(interval);
     }
   }, [status, router]);
 
   const fetchBins = async () => {
     try {
-      const res = await fetch("/api/bins");
+      const res = await fetch(`/api/bins?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         
         // Enhance bins with their latest log data
         const enhancedBins = await Promise.all(data.map(async (bin: any) => {
-          const logRes = await fetch(`/api/bins/${bin.id}`);
+          const logRes = await fetch(`/api/bins/${bin.id}?t=${Date.now()}`);
           if (logRes.ok) {
             const { logs } = await logRes.json();
             return { ...bin, latestLog: logs.length > 0 ? logs[0] : null };
@@ -80,15 +80,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
       
-      {/* NOTIFICATION SYSTEM: Floating Alerts */}
-      <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
-        {alerts.map((alert, idx) => (
-          <div key={idx} className="animate-bounce bg-red-500/90 text-white px-6 py-3 rounded-xl shadow-[0_0_20px_rgba(239,68,68,0.5)] backdrop-blur-md font-bold flex items-center gap-2 border border-red-400">
-            <span>⚠️</span>
-            {alert}
-          </div>
-        ))}
-      </div>
+      {/* NOTIFICATION SYSTEM: Removed per user request */}
 
       <div className="flex items-center justify-between mb-8">
         <div>

@@ -4,16 +4,18 @@ import { authOptions } from "@/lib/authOptions";
 import pool from "@/lib/db";
 import { RowDataPacket } from "mysql2";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const userId = (session.user as any).id;
-    const binId = params.id;
+    const { id: binId } = await params;
 
     const [bins] = await pool.query<RowDataPacket[]>(
       "SELECT * FROM bins WHERE id = ? AND user_id = ?",
@@ -37,14 +39,14 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     const userId = (session.user as any).id;
-    const binId = params.id;
+    const { id: binId } = await params;
 
     await pool.query(
       "DELETE FROM bins WHERE id = ? AND user_id = ?",
