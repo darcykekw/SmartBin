@@ -1,7 +1,7 @@
 # SmartBin IoT Waste Management System
 
 ## Overview
-SmartBin is a comprehensive Internet of Things (IoT) waste management solution designed to provide real-time monitoring of waste fill levels. The system integrates embedded hardware with a modern web dashboard to optimize waste collection processes, featuring instantaneous status feedback, continuous hardware monitoring, and an asynchronous data synchronization architecture.
+SmartBin is a smart waste management project that helps users track trash levels in real time. Built with the Internet of Things (IoT) in mind, it combines physical hardware inside the bin with a clean, modern web dashboard. The goal is to make waste collection more efficient by giving users immediate alerts when a bin is getting full, preventing overflow and saving time.
 
 ## Architecture
 
